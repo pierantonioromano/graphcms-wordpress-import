@@ -1,0 +1,3 @@
+#migrationProgress span { display: none; }
+#migrationProgress.running span.running { display: block; }
+#migrationProgress.done span.done { display: block; }
