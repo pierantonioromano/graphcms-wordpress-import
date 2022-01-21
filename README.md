@@ -14,6 +14,16 @@ Then you should rename config-sample.php to config.php:
 mv config-sample.php config.php
 ```
 
+# How is the app structured
+Opening the app in the browser, you will notice a home screen with a list of available Models.
+The app is built to manage all Wordpress contents as a "Model".
+Each "Model" needs a "Runner", put in the /runners subfolder.
+
+When you click a model, the app calls the Wordpress REST API endpoint, using the parameters provided in the config file.
+You will see a summary of those parameters, and the total count of the available contents.
+After starting the import, a call to the corresponding runner will be made for each content ID.
+You will see a report for each processed record.
+
 # Configuration settings
 Let's take a look at the config.php file:
 ```
@@ -31,6 +41,15 @@ $graphCmsToken = "Bearer <your-token>";
 The first section is relative to your Wordpress environment.
 The first thing you have to do is to create an [Application Password for your REST API](https://artisansweb.net/how-to-use-application-passwords-in-wordpress-for-rest-api-authentication/); put user and the news created password in the $wpUserPwd variable.
 
+The two sample endpoints are for posts.
+The first one is needed to fetch post IDs.
+The second one is for the single API call. Notice the %d parameter, which will be replaced with post ID during the import.
+Feel free to customize them, according to the [Wordpress REST API reference](https://developer.wordpress.org/rest-api/reference/).
+If you are planning to add your custom Runners, remember to add the two new endpoints in the config.php file.
+
 The second section is relative to your GraphCMS environment.
-You can find your endpoints in your GraphCMS control panel, in the Project Settings / Api Access / Endpoint section; please notice the two endpoints, the first one is for content management, the second one is for assets upload.
-You should create a Permanent Auth Token, giving to it all the permissions you need; copy the token in the $graphCMS variable.
+You can find your endpoints in your GraphCMS control panel, in the **Project Settings / Api Access / Endpoint** section; please notice the two endpoints, the first one is for content management, the second one is for assets upload.
+You should create a **Permanent Auth Token**, giving to it all the permissions you need; copy the token in the $graphCMS variable.
+
+# Is the app ready for production?
+The answer is: it depends.
