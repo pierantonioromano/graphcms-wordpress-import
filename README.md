@@ -81,7 +81,7 @@ There isn't a universal answer to this question.
 You should write some custom functions to map your Wordpress fields to the ones on the GraphCMS side.
 You can place your code in the functions.php file and then call the function from each Runner, when parsing the Wordpress output.
 
-## How are the assets managed?
+## How are assets managed?
 In the sample Posts Runner, I created a function that uploads images with the [GraphCMS Upload API](https://graphcms.com/docs/api-reference/content-api/assets).
 The featured post image is uploaded and then referenced in the cover_image field.
 Images contained in the post body are uploaded via API and then a url replacement is made in the post content.
