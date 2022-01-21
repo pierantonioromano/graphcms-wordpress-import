@@ -7,6 +7,7 @@ $wpEndpoints['posts_total'] = "https://www.example.com/wp-json/wp/v2/posts?per_p
 $wpEndpoints['posts_single'] = "https://www.example.com/wp-json/wp/v2/posts/%d?context=edit&_embed";
 
 //GraphCMS Settings
+$graphCmsDefaultAuthor = "<author-id>";
 $graphCmsEndpoint = "https://api-eu-central-1.graphcms.com/v2/<project-id>/master";
 $graphCmsUploadEndpoint = "https://api-eu-central-1.graphcms.com/v2/<project-id>/master/upload";
 $graphCmsToken = "Bearer <your-token>";

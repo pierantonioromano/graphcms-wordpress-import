@@ -37,7 +37,7 @@ else
 
 	//Build post data
 	$currentPost = [];
-	$currentPost['author'] = "ckxnik2vsz85f0b600u23j9v6";
+	$currentPost['author'] = $graphCmsDefaultAuthor;
 	$currentPost['title'] = $wpRecord->title->rendered;
 	$currentPost['excerpt'] = $wpRecord->acf->postsubtitle ? $wpRecord->acf->postsubtitle : strip_tags($wpRecord->excerpt->raw);
 	$currentPost['slug'] = $wpRecord->slug;
