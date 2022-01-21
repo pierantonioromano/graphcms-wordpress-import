@@ -5,7 +5,7 @@ This project is a starting point to import your content from Wordpress to GraphC
 Clone this repository on your local machine.
 A local PHP stack, like MAMP, is required; you can also put this package on your remote server, but be careful: this script has no built-in access control, so you should put it in a restricted access folder, and remove it after your migration process is completed.
 
-Run composer and install required dependencies:
+Run Composer and install required dependencies:
 ```
 php composer.phar install
 ```
@@ -20,7 +20,7 @@ The app is built to manage all Wordpress contents as a "Model".
 Each "Model" needs a "Runner", put in the /runners subfolder.
 
 When you click a model, the app calls the Wordpress REST API endpoint, using the parameters provided in the config file.
-You will see a summary of those parameters, and the total count of the available contents.
+You will see a summary of those parameters, and the total count of available contents.
 After starting the import, a call to the corresponding runner will be made for each content ID.
 You will see a report for each processed record.
 
@@ -40,7 +40,7 @@ $graphCmsUploadEndpoint = "https://api-eu-central-1.graphcms.com/v2/<project-id>
 $graphCmsToken = "Bearer <your-token>";
 ```
 The first section is relative to your Wordpress environment.
-The first thing you have to do is to create an [Application Password for your REST API](https://artisansweb.net/how-to-use-application-passwords-in-wordpress-for-rest-api-authentication/); put user and the news created password in the $wpUserPwd variable.
+The first thing you have to do is to create an [Application Password for your REST API](https://artisansweb.net/how-to-use-application-passwords-in-wordpress-for-rest-api-authentication/); put your admin username and the new created password in the $wpUserPwd variable.
 
 The two sample endpoints are for posts.
 The first one is needed to fetch post IDs.
@@ -49,7 +49,7 @@ Feel free to customize them, according to the [Wordpress REST API reference](htt
 If you are planning to add your custom Runners, remember to add the two new endpoints in the config.php file.
 
 The second section is relative to your GraphCMS environment.
-You can find your endpoints in your GraphCMS control panel, in the **Project Settings / Api Access / Endpoint** section; please notice the two endpoints, the first one is for content management, the second one is for assets upload.
+You can find your endpoints in your GraphCMS control panel, in the **Project Settings / Api Access / Endpoint** section; please notice the two different endpoints, the first one is for content management, the second one is for assets upload.
 You should create a **Permanent Auth Token**, giving to it all the permissions you need; copy the token in the $graphCMS variable.
 The $graphCmsDefaultAuthor is the ID of the default author for imported content; you can create a new Author in GraphCMS and then put the ID in this variable.
 
