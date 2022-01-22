@@ -90,6 +90,12 @@ Images contained in the post body are uploaded via API and then a url replacemen
 Yes, Posts Runner performs an "UpSert" mutation (update or insert), taking the post slug as unique field.
 Remember that assets are not cleaned or updated, so you should delete them from GraphCMS before running a new import.
 
+## How can I make the import faster?
+Each import request needs some seconds to be processed, but if you have a huge amount of content, this may take a while.
+The bottlenecks of the import process are asset processing and Wordpress API time response.
+While there is nothing to do for assets, you can improve Wordpress API time response stripping out the "_embed" parameter from the endpoint urls. 
+Please notice that stripping out the "_embed" parameter means that you have to customize your Wordpress theme/plugin code to output media data in the API response, and change the Runner code to fetch new added fields.
+
 ## Where can I see imported content?
 You can see imported content in the corresponding model on GraphCMS.
 Please note that imported content is in DRAFT stage, so you should perform a bulk Publish operation before seeing them on your frontend.

@@ -39,7 +39,6 @@
 				if($responseContent && count($responseContent) > 0)
 				{
 					echo '<h3 class="text-xl font-bold mb-6">' . count($responseContent) . ' ' . $moduleSlug . ' found</h2>';
-					//echo '<p><strong>Remote endpoint</strong>: ' . $wpEndpoints[$moduleSlugTotal] . '</p>';
 					?>
 
 					<script>
@@ -71,7 +70,7 @@
 
 					<!-- Endpoint summary -->
 					<div id="migrationEndpointSummary" class="my-6 mb-12 relative rounded-lg bg-gray-700 max-h-[500px] overflow-auto" style="font-family: 'Fira Code';">
-						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800">
+						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800 shadow-lg">
 							<?=parse_url($wpEndpoints[$moduleSlugTotal], PHP_URL_PATH)?>
 						</div>
 						<div class="p-4">
@@ -79,8 +78,8 @@
 
 							//Show endpoint params
 							$endpointParams = explode("&", parse_url($wpEndpoints[$moduleSlugTotal], PHP_URL_QUERY));
-							$endpointParams = implode(",", $endpointParams);
-							$endpointParamsChunks = array_chunk(preg_split('/(=|,)/', $endpointParams), 2);
+							$endpointParams = implode("###PARAM_SEPARATOR###", $endpointParams);
+							$endpointParamsChunks = array_chunk(preg_split('/(=|###PARAM_SEPARATOR###)/', $endpointParams), 2);
 							
 							$endpointParamsResult = array_combine(array_column($endpointParamsChunks, 0), array_column($endpointParamsChunks, 1));
 							$printable = json_encode($endpointParamsResult, JSON_PRETTY_PRINT);
@@ -94,13 +93,14 @@
 					</div>
 
 					<!-- Module start button -->
-					<a id="backIndexButton" href="index.php" class="bg-gray-600 hover:bg-gray-700 py-4 px-8 mr-2 rounded-lg">Back to Modules</a>
-					<a id="migrationStartButton" href="javascript:void(0)" onclick="migrationStart()" class="bg-blue-600 hover:bg-blue-700 py-4 px-8 rounded-lg">Start import</a>
+					<a id="backIndexButton" href="index.php" class="font-bold bg-gray-600 hover:bg-gray-700 py-4 px-8 mr-2 rounded-lg">Back to Modules</a>
+					<a id="migrationStartButton" href="javascript:void(0)" onclick="migrationStart()" class="font-bold bg-blue-600 hover:bg-blue-700 py-4 px-8 rounded-lg">Start import</a>
 					<!-- Module log wrapper -->
 					<div id="migrationLogWrapper" class="my-6 relative rounded-lg bg-gray-700 h-[500px] overflow-auto" style="font-family: 'Fira Code'; display: none;">
-						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800">
-							Successful: <strong class="text-green-400" id="moduleSuccessfulCounter">0</strong>
-							Errors: <strong class="text-red-400" id="moduleErroredCounter">0</strong>
+						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800 shadow-lg">
+							Successful: <strong class="text-green-400 mr-4" id="moduleSuccessfulCounter">0</strong>
+							Errors: <strong class="text-red-400 mr-4" id="moduleErroredCounter">0</strong>
+							Time: <strong class="text-yellow-400" id="migrationTimer"></strong>
 							<span id="migrationProgress" class="absolute right-4">
 								<span class="running">
 									<img src="assets/img/loading.svg" class="max-w-[24px] inline" alt="Loading..." />

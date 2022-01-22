@@ -33,7 +33,7 @@ else
 	$wpResponseJson = $wpResponse->getBody()->getContents();
 	$wpRecord = json_decode($wpResponseJson);
 
-	$retVal['msg'] .= "<p class='text-blue-300'>Processing post: " . $wpRecord->title->raw . "</p>";
+	$retVal['msg'] .= "<p class='text-gray-200'>Processing post: " . $wpRecord->title->raw . "</p>";
 
 	//Build post data
 	$currentPost = [];
@@ -56,7 +56,7 @@ else
 	{
 		$currentPost['cover_image'] = array_values($currentPost['cover_image'])[0];
 
-		$retVal['msg'] .= "<p class='text-white'>Imported featured image as: " . $currentPost['cover_image'] . "</p>";
+		$retVal['msg'] .= "<p class='text-gray-200'>Imported featured image as: " . $currentPost['cover_image'] . "</p>";
 	}
 
 	//Images in post body
@@ -70,7 +70,7 @@ else
 		//Replace original images in post body
 		$currentPost['content'] = str_replace(array_keys($currentPost['extraImages']), array_values($currentPost['extraImages']), $currentPost['content']);
 
-		$retVal['msg'] .= "<p class='text-white'>Imported " . count($currentPost['extraImages']) . " post body images</p>";
+		$retVal['msg'] .= "<p class='text-gray-200'>Imported " . count($currentPost['extraImages']) . " post body image(s)</p>";
 	}
 
 	//Build GraphQL query
@@ -128,7 +128,7 @@ GQL;
 	//Process GraphCMS results
 	if($graphCmsData->upsertPost->id)
 	{
-		$retVal['msg'] .= "<p class='text-green-300'>Successful import: " . $graphCmsData->upsertPost->id . " - " . $graphCmsData->upsertPost->title . "</p>";
+		$retVal['msg'] .= "<p class='text-green-300'>Successful import: " . $graphCmsData->upsertPost->id . "</p>";
 		$retVal['status'] = "OK";
 	}
 	else
