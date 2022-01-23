@@ -44,6 +44,9 @@ $options = array();
 $options['posts']['process_featured_image'] = true;
 $options['posts']['process_post_body_images'] = true;
 $options['posts']['perform_dry_run'] = false;
+$options['pages']['process_featured_image'] = false;
+$options['pages']['process_post_body_images'] = true;
+$options['pages']['perform_dry_run'] = false;
 ```
 The first section is relative to your Wordpress environment.
 The first thing you have to do is to create an [Application Password for your REST API](https://artisansweb.net/how-to-use-application-passwords-in-wordpress-for-rest-api-authentication/); put your admin username and the new created password in the $wpUserPwd variable.
@@ -70,6 +73,13 @@ Since every Wordpress and GraphCMS setup can be heavily customized, this app is 
 You should investigate the sample Posts Runner and make sure that field names, data format and GraphQL Queries are properly suited to your needs.
 
 # FAQ
+## I'm getting a GraphCMS error about the format of the "content" field
+If you started a new GraphCMS project with the Blog schema, by default it is a RichText field.
+This import tool works correctly with the "content" field as a "Multi-line Text".
+You can change the field content type from your GraphCMS Schema section.
+If you want to keep "content" as a RichText field, you have to change the graphQL mutation in the runner code.
+See [https://graphcms.com/docs/api-reference/schema/field-types#rich-text](here) for details.
+
 ## Why do I get an API error when putting per_page > 100?
 For security and performance reasons, the Wordpress REST API response is limited to 100 records.
 You can increase this limit by adding a custom hook to your theme/plugin, or you can slice the migration process in multiple steps, using the "per_page" and "offset" parameters.

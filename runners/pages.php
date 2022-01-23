@@ -1,7 +1,7 @@
 <?php
 
 /*
-	Migration runner for content type: Posts
+	Migration runner for content type: Pages
 */
 
 require '../vendor/autoload.php';
@@ -36,80 +36,72 @@ else
 	$wpResponseJson = $wpResponse->getBody()->getContents();
 	$wpRecord = json_decode($wpResponseJson);
 
-	$retVal['msg'] .= "<p class='text-gray-400'>Processing post: " . $wpRecord->title->raw . "</p>";
+	$retVal['msg'] .= "<p class='text-gray-400'>Processing page: " . $wpRecord->title->raw . "</p>";
 
 	//Build post data
-	$currentPost = [];
-	$currentPost['author'] = $graphCmsDefaultAuthor;
-	$currentPost['title'] = $wpRecord->title->rendered;
-	$currentPost['excerpt'] = $wpRecord->acf->postsubtitle ? $wpRecord->acf->postsubtitle : strip_tags($wpRecord->excerpt->raw);
-	$currentPost['slug'] = $wpRecord->slug;
-	$currentPost['content'] = $wpRecord->content->raw;
+	$currentPage = [];
+	$currentPage['title'] = $wpRecord->title->rendered;
+	$currentPage['slug'] = $wpRecord->slug;
+	$currentPage['content'] = $wpRecord->content->raw;
 		
 	//Date
 	$postDateObj = new DateTime($wpRecord->date);
-	$currentPost['date'] = $postDateObj->format(DateTime::ATOM); //Iso 8601
+	$currentPage['date'] = $postDateObj->format(DateTime::ATOM); //Iso 8601
 
 	//Featured image
 	if($options[$moduleSlug]['process_featured_image'] === true && $options[$moduleSlug]['perform_dry_run'] !== true)
 	{
-		$currentPost['cover_image'] = property_exists($wpRecord->_embedded, "wp:featuredmedia") ? uploadGraphCMSAsset(array($wpRecord->_embedded->{"wp:featuredmedia"}[0]->media_details->sizes->full->source_url), 'id') : "";
+		$currentPage['cover_image'] = property_exists($wpRecord->_embedded, "wp:featuredmedia") ? uploadGraphCMSAsset(array($wpRecord->_embedded->{"wp:featuredmedia"}[0]->media_details->sizes->full->source_url), 'id') : "";
 
-		if($currentPost['cover_image'] != "")
+		if($currentPage['cover_image'] != "")
 		{
-			$currentPost['cover_image'] = array_values($currentPost['cover_image'])[0];
+			$currentPage['cover_image'] = array_values($currentPage['cover_image'])[0];
 
-			$retVal['msg'] .= "<p class='text-gray-400'>Imported featured image as: " . $currentPost['cover_image'] . "</p>";
+			$retVal['msg'] .= "<p class='text-gray-400'>Imported featured image as: " . $currentPage['cover_image'] . "</p>";
 		}
 	}
 
 	//Images in post body
 	if($options[$moduleSlug]['process_post_body_images'] === true && $options[$moduleSlug]['perform_dry_run'] !== true)
 	{
-		$currentPostExtraImages = extractImageUrlsFromPost($currentPost['content']);
+		$currentPageExtraImages = extractImageUrlsFromPost($currentPage['content']);
 
-		if($currentPostExtraImages)
+		if($currentPageExtraImages)
 		{
-			$currentPostExtraImagesUploadJob = uploadGraphCMSAsset($currentPostExtraImages, 'url');
-			$currentPost['extraImages'] = $currentPostExtraImagesUploadJob;
+			$currentPageExtraImagesUploadJob = uploadGraphCMSAsset($currentPageExtraImages, 'url');
+			$currentPage['extraImages'] = $currentPageExtraImagesUploadJob;
 
 			//Replace original images in post body
-			$currentPost['content'] = str_replace(array_keys($currentPost['extraImages']), array_values($currentPost['extraImages']), $currentPost['content']);
+			$currentPage['content'] = str_replace(array_keys($currentPage['extraImages']), array_values($currentPage['extraImages']), $currentPage['content']);
 
-			$retVal['msg'] .= "<p class='text-gray-400'>Imported " . count($currentPost['extraImages']) . " post body image(s)</p>";
+			$retVal['msg'] .= "<p class='text-gray-400'>Imported " . count($currentPage['extraImages']) . " post body image(s)</p>";
 		}
 	}
 
 	//Build GraphQL query
 	if($options[$moduleSlug]['process_featured_image'] === true && $options[$moduleSlug]['perform_dry_run'] !== true)
-		$coverImageQuery = ($currentPost['cover_image'] != "") ? 'coverImage: {connect: {id: "' . $currentPost['cover_image'] . '"}}' : "";
+		$coverImageQuery = ($currentPage['cover_image'] != "") ? 'coverImage: {connect: {id: "' . $currentPage['cover_image'] . '"}}' : "";
 	else
 		$coverImageQuery = "";
 
 	$query = <<<GQL
-		mutation upsertPost {
-			upsertPost( 
+		mutation upsertPage {
+			upsertPage( 
 				upsert: {
 					create: { 
-						author: {connect: {id: "{$currentPost['author']}"}}, 
-						title: """{$currentPost['title']}""", 
-						excerpt: """{$currentPost['excerpt']}""", 
-						slug: "{$currentPost['slug']}", 
-						date: "{$currentPost['date']}", 
-						content: """{$currentPost['content']}""", 
+						title: """{$currentPage['title']}""", 
+						slug: "{$currentPage['slug']}", 
+						content: """{$currentPage['content']}""", 
 						{$coverImageQuery}
 					}, 
 					update: { 
-						author: {connect: {id: "{$currentPost['author']}"}}, 
-						title: """{$currentPost['title']}""", 
-						excerpt: """{$currentPost['excerpt']}""", 
-						slug: "{$currentPost['slug']}", 
-						date: "{$currentPost['date']}", 
-						content: """{$currentPost['content']}""", 
+						title: """{$currentPage['title']}""", 
+						slug: "{$currentPage['slug']}", 
+						content: """{$currentPage['content']}""", 
 						{$coverImageQuery}
 					}
 				}
-				where: { slug: "{$currentPost['slug']}" }
+				where: { slug: "{$currentPage['slug']}" }
 			)
 			{
 				id
@@ -139,9 +131,9 @@ GQL;
 		$graphCmsData = $graphCmsBody->data;
 
 		//Process GraphCMS results
-		if($graphCmsData->upsertPost->id)
+		if($graphCmsData->upsertPage->id)
 		{
-			$retVal['msg'] .= "<p class='text-sky-300'>Successful import: " . $graphCmsData->upsertPost->id . "</p>";
+			$retVal['msg'] .= "<p class='text-sky-300'>Successful import: " . $graphCmsData->upsertPage->id . "</p>";
 			$retVal['status'] = "OK";
 		}
 		else

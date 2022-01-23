@@ -75,7 +75,7 @@
 
 					<!-- Endpoint summary -->
 					<div id="migrationEndpointSummary" class="my-6 mb-12 relative rounded-lg bg-gray-700 max-h-[500px] overflow-auto" style="font-family: 'Fira Code';">
-						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800 shadow-lg">
+						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800 shadow-lg rounded-t-lg">
 							<?=parse_url($wpEndpoints[$moduleSlugTotal], PHP_URL_PATH)?>
 						</div>
 						<div class="p-4">
@@ -99,7 +99,7 @@
 
 					<!-- Module log wrapper -->
 					<div id="migrationLogWrapper" class="my-6 relative rounded-lg bg-gray-700 h-[500px] overflow-auto" style="font-family: 'Fira Code'; display: none;">
-						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800 shadow-lg">
+						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800 shadow-lg rounded-t-lg">
 							Successful: <strong class="text-green-400 mr-4" id="moduleSuccessfulCounter">0</strong>
 							Errors: <strong class="text-red-400 mr-4" id="moduleErroredCounter">0</strong>
 							Time: <strong class="text-white" id="migrationTimer"></strong>
