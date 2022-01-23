@@ -12,4 +12,10 @@ $graphCmsEndpoint = "https://api-eu-central-1.graphcms.com/v2/<project-id>/maste
 $graphCmsUploadEndpoint = "https://api-eu-central-1.graphcms.com/v2/<project-id>/master/upload";
 $graphCmsToken = "Bearer <your-token>";
 
+//Module options
+$options = array();
+$options['posts']['process_featured_image'] = true;
+$options['posts']['process_post_body_images'] = true;
+$options['posts']['perform_dry_run'] = false;
+
 ?>

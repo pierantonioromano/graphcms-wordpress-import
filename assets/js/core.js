@@ -16,7 +16,7 @@ function migrationStart()
 {
 	if(!window.moduleRunner || !window.moduleRequests)
 	{
-		alert("Unable to start migration. Check your module code and makle sure that content is available on your Wordpress endpoint.");
+		alert("Unable to start migration. Check your module code and make sure that content is available on your Wordpress endpoint.");
 		return false;
 	}
 
@@ -44,8 +44,9 @@ function processModuleRequests()
 			data: { id: moduleRequest },
 			method: 'GET',
 			dataType: 'json',
+			timeout: 0,
 			beforeSend: function(jqXHR, settings){
-				$("#migrationLog").append('<p class="text-yellow-300 mt-2">Starting request for ID: ' + moduleRequest);
+				$("#migrationLog").append('<p class="text-white mt-2">Starting request for ID: ' + moduleRequest);
 			}
 		})
 		.done(function(data, textStatus, jqXHR){
@@ -73,7 +74,7 @@ function processModuleRequests()
 		window.isRunningImport = false;
 		$("#migrationTimer").timer('pause');
 		$("#migrationProgress").removeClass("running").addClass("done");
-		$("#migrationLog").append('<p class="text-yellow-300">Import completed!</p>');
+		$("#migrationLog").append('<p class="text-green-300 mt-4">Import completed!</p>');
 
 		//Show retry buttons...
 		$("#migrationStartButton")

@@ -8,6 +8,9 @@ require '../vendor/autoload.php';
 include("../config.php");
 include("../functions.php");
 
+//no time limit while running import
+set_time_limit(0); 
+
 $retVal = array("status" => "", "msg" => "");
 $moduleSlug = basename($_SERVER['PHP_SELF'], ".php");
 $moduleSlugTotal = $moduleSlug . "_total";
@@ -33,7 +36,7 @@ else
 	$wpResponseJson = $wpResponse->getBody()->getContents();
 	$wpRecord = json_decode($wpResponseJson);
 
-	$retVal['msg'] .= "<p class='text-gray-200'>Processing post: " . $wpRecord->title->raw . "</p>";
+	$retVal['msg'] .= "<p class='text-gray-400'>Processing post: " . $wpRecord->title->raw . "</p>";
 
 	//Build post data
 	$currentPost = [];
@@ -48,33 +51,41 @@ else
 	$currentPost['date'] = $postDateObj->format(DateTime::ATOM); //Iso 8601
 
 	//Featured image
-	$currentPost['cover_image'] = property_exists($wpRecord->_embedded, "wp:featuredmedia") ? uploadGraphCMSAsset(array($wpRecord->_embedded->{"wp:featuredmedia"}[0]->media_details->sizes->full->source_url), 'id') : "";
-
-	//print_r($currentPost['cover_image']);
-
-	if($currentPost['cover_image'] != "")
+	if($options[$moduleSlug]['process_featured_image'] === true && $options[$moduleSlug]['perform_dry_run'] !== true)
 	{
-		$currentPost['cover_image'] = array_values($currentPost['cover_image'])[0];
+		$currentPost['cover_image'] = property_exists($wpRecord->_embedded, "wp:featuredmedia") ? uploadGraphCMSAsset(array($wpRecord->_embedded->{"wp:featuredmedia"}[0]->media_details->sizes->full->source_url), 'id') : "";
 
-		$retVal['msg'] .= "<p class='text-gray-200'>Imported featured image as: " . $currentPost['cover_image'] . "</p>";
+		if($currentPost['cover_image'] != "")
+		{
+			$currentPost['cover_image'] = array_values($currentPost['cover_image'])[0];
+
+			$retVal['msg'] .= "<p class='text-gray-400'>Imported featured image as: " . $currentPost['cover_image'] . "</p>";
+		}
 	}
 
 	//Images in post body
-	$currentPostExtraImages = extractImageUrlsFromPost($currentPost['content']);
-
-	if($currentPostExtraImages)
+	if($options[$moduleSlug]['process_post_body_images'] === true && $options[$moduleSlug]['perform_dry_run'] !== true)
 	{
-		$currentPostExtraImagesUploadJob = uploadGraphCMSAsset($currentPostExtraImages, 'url');
-		$currentPost['extraImages'] = $currentPostExtraImagesUploadJob;
+		$currentPostExtraImages = extractImageUrlsFromPost($currentPost['content']);
 
-		//Replace original images in post body
-		$currentPost['content'] = str_replace(array_keys($currentPost['extraImages']), array_values($currentPost['extraImages']), $currentPost['content']);
+		if($currentPostExtraImages)
+		{
+			$currentPostExtraImagesUploadJob = uploadGraphCMSAsset($currentPostExtraImages, 'url');
+			$currentPost['extraImages'] = $currentPostExtraImagesUploadJob;
 
-		$retVal['msg'] .= "<p class='text-gray-200'>Imported " . count($currentPost['extraImages']) . " post body image(s)</p>";
+			//Replace original images in post body
+			$currentPost['content'] = str_replace(array_keys($currentPost['extraImages']), array_values($currentPost['extraImages']), $currentPost['content']);
+
+			$retVal['msg'] .= "<p class='text-gray-400'>Imported " . count($currentPost['extraImages']) . " post body image(s)</p>";
+		}
 	}
 
 	//Build GraphQL query
-	$coverImageQuery = ($currentPost['cover_image'] != "") ? 'coverImage: {connect: {id: "' . $currentPost['cover_image'] . '"}}' : "";
+	if($options[$moduleSlug]['process_post_body_images'] === true && $options[$moduleSlug]['perform_dry_run'] !== true)
+		$coverImageQuery = ($currentPost['cover_image'] != "") ? 'coverImage: {connect: {id: "' . $currentPost['cover_image'] . '"}}' : "";
+	else
+		$coverImageQuery = "";
+
 	$query = <<<GQL
 		mutation upsertPost {
 			upsertPost( 
@@ -109,32 +120,40 @@ else
 GQL;
 
 	//Run GraphCMS Request
-	$graphCmsClient = new \GuzzleHttp\Client();
-
-	$graphCmsResponse = $graphCmsClient->request('POST', $graphCmsEndpoint, [
-		'headers' => [
-			'Authorization' => $graphCmsToken,
-			'Content-Type' => 'application/json',
-		],
-		'json' => [
-			'query' => $query
-		]
-	]);
-
-	$graphCmsResponseJson = $graphCmsResponse->getBody()->getContents();
-	$graphCmsBody = json_decode($graphCmsResponseJson);
-	$graphCmsData = $graphCmsBody->data;
-
-	//Process GraphCMS results
-	if($graphCmsData->upsertPost->id)
+	if($options[$moduleSlug]['perform_dry_run'] === false)
 	{
-		$retVal['msg'] .= "<p class='text-green-300'>Successful import: " . $graphCmsData->upsertPost->id . "</p>";
-		$retVal['status'] = "OK";
+		$graphCmsClient = new \GuzzleHttp\Client();
+
+		$graphCmsResponse = $graphCmsClient->request('POST', $graphCmsEndpoint, [
+			'headers' => [
+				'Authorization' => $graphCmsToken,
+				'Content-Type' => 'application/json',
+			],
+			'json' => [
+				'query' => $query
+			]
+		]);
+
+		$graphCmsResponseJson = $graphCmsResponse->getBody()->getContents();
+		$graphCmsBody = json_decode($graphCmsResponseJson);
+		$graphCmsData = $graphCmsBody->data;
+
+		//Process GraphCMS results
+		if($graphCmsData->upsertPost->id)
+		{
+			$retVal['msg'] .= "<p class='text-sky-300'>Successful import: " . $graphCmsData->upsertPost->id . "</p>";
+			$retVal['status'] = "OK";
+		}
+		else
+		{
+			$retVal['msg'] .= "<p class='text-red-300'>GraphCMS import error!</p>";
+			$retVal['status'] = "KO";
+		}
 	}
 	else
 	{
-		$retVal['msg'] .= "<p class='text-red-300'>GraphCMS import error!</p>";
-		$retVal['status'] = "KO";
+		$retVal['msg'] .= "<p class='text-pink-300'>Dry run is active - No insert on GraphCMS was done!</p>";
+		$retVal['status'] = "OK";
 	}
 
 }

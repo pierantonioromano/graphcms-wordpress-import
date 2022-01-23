@@ -15,7 +15,7 @@
 					echo '<a class="block w-96 bg-gray-800 hover:bg-gray-700 font-bold p-4 mb-4 rounded-lg" href="' . $_SERVER['PHP_SELF'] . '?module=' . basename($filename, ".php") . '">' . ucwords(basename($filename, ".php")) . '</a>';
 				}
 			}
-			else
+			elseif(isset($_GET['module']) && file_exists('runners/' . $_GET['module'] . '.php'))
 			{
 				//Module settings
 				$moduleSlug = $_GET['module'];
@@ -25,15 +25,20 @@
 				//Call WP Endpoint and fetch total data
 				$client = new \GuzzleHttp\Client();
 
-				$response = $client->request('GET', $wpEndpoints[$moduleSlugTotal], [
-					'headers' => [
-						'Authorization' => "Basic " . base64_encode($wpUserPwd),
-						'Content-Type' => 'application/json',
-					]
-				]);
+				if(isset($wpEndpoints[$moduleSlugTotal]))
+				{
+					$response = $client->request('GET', $wpEndpoints[$moduleSlugTotal], [
+						'headers' => [
+							'Authorization' => "Basic " . base64_encode($wpUserPwd),
+							'Content-Type' => 'application/json',
+						]
+					]);
 
-				$responseJson = $response->getBody()->getContents();
-				$responseContent = json_decode($responseJson);
+					$responseJson = $response->getBody()->getContents();
+					$responseContent = json_decode($responseJson);
+				}
+				else
+					$responseContent = "";
 
 				//Create page wrapper and setup data
 				if($responseContent && count($responseContent) > 0)
@@ -92,15 +97,12 @@
 						</div>
 					</div>
 
-					<!-- Module start button -->
-					<a id="backIndexButton" href="index.php" class="font-bold bg-gray-600 hover:bg-gray-700 py-4 px-8 mr-2 rounded-lg">Back to Modules</a>
-					<a id="migrationStartButton" href="javascript:void(0)" onclick="migrationStart()" class="font-bold bg-blue-600 hover:bg-blue-700 py-4 px-8 rounded-lg">Start import</a>
 					<!-- Module log wrapper -->
 					<div id="migrationLogWrapper" class="my-6 relative rounded-lg bg-gray-700 h-[500px] overflow-auto" style="font-family: 'Fira Code'; display: none;">
 						<div class="sticky top-0 left-0 w-full p-4 bg-gray-800 shadow-lg">
 							Successful: <strong class="text-green-400 mr-4" id="moduleSuccessfulCounter">0</strong>
 							Errors: <strong class="text-red-400 mr-4" id="moduleErroredCounter">0</strong>
-							Time: <strong class="text-yellow-400" id="migrationTimer"></strong>
+							Time: <strong class="text-white" id="migrationTimer"></strong>
 							<span id="migrationProgress" class="absolute right-4">
 								<span class="running">
 									<img src="assets/img/loading.svg" class="max-w-[24px] inline" alt="Loading..." />
@@ -114,13 +116,21 @@
 						<div id="migrationLog" class="p-4"></div>
 					</div>
 
+					<!-- Module start button -->
+					<a id="backIndexButton" href="index.php" class="font-bold bg-gray-600 hover:bg-gray-700 py-4 px-8 mr-2 rounded-lg">Back to Modules</a>
+					<a id="migrationStartButton" href="javascript:void(0)" onclick="migrationStart()" class="font-bold bg-blue-600 hover:bg-blue-700 py-4 px-8 rounded-lg">Start import</a>
+
 					<?php
 
 				}
 				else
-					echo "No contents found on Wordpress Endpoint.";
+					echo "No contents found on Wordpress Endpoint.<br/>Make sure that the endpoint is correctly set in config.php";
 
-				
+			}
+			else
+			{
+				echo '<h2 class="text-xl font-bold mb-4">Invalid module</h2>';
+				echo '<p class="text-white">Check that the runner file is properly located in the /runners folder and the endpoints for this module are properly set in config.php.</p>';
 			}
 
 			?>

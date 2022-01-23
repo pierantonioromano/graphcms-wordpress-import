@@ -38,6 +38,12 @@ $graphCmsDefaultAuthor = "<author-id>";
 $graphCmsEndpoint = "https://api-eu-central-1.graphcms.com/v2/<project-id>/master";
 $graphCmsUploadEndpoint = "https://api-eu-central-1.graphcms.com/v2/<project-id>/master/upload";
 $graphCmsToken = "Bearer <your-token>";
+
+//Module options
+$options = array();
+$options['posts']['process_featured_image'] = true;
+$options['posts']['process_post_body_images'] = true;
+$options['posts']['perform_dry_run'] = false;
 ```
 The first section is relative to your Wordpress environment.
 The first thing you have to do is to create an [Application Password for your REST API](https://artisansweb.net/how-to-use-application-passwords-in-wordpress-for-rest-api-authentication/); put your admin username and the new created password in the $wpUserPwd variable.
@@ -53,12 +59,21 @@ You can find your endpoints in your GraphCMS control panel, in the **Project Set
 You should create a **Permanent Auth Token**, giving to it all the permissions you need; copy the token in the $graphCMS variable.
 The $graphCmsDefaultAuthor is the ID of the default author for imported content; you can create a new Author in GraphCMS and then put the ID in this variable.
 
+The third section is for module-based options.
+You can wrap with options some parts of your Runner to enable/disable some steps of the migration process.
+In the sample Posts Runner three options are provided: process featured image, process post body images and dry run.
+Dry run skips assets upload and GraphQL execution; it's useful to simulate the import process before running, making sure ther are no warning or php errors.
+
 # Is the app ready for production?
 The answer is: it depends.
 Since every Wordpress and GraphCMS setup can be heavily customized, this app is not intended to be a "click and run" solution.
 You should investigate the sample Posts Runner and make sure that field names, data format and GraphQL Queries are properly suited to your needs.
 
 # FAQ
+## Why do I get an API error when putting per_page > 100?
+For security and performance reasons, the Wordpress REST API response is limited to 100 records.
+You can increase this limit by adding a custom hook to your theme/plugin, or you can slice the migration process in multiple steps, using the "per_page" and "offset" parameters.
+
 ## How can I display ACF custom fields in Wordpress API output?
 If you use Advanced Custom Fields, you have to [enable the option](https://www.advancedcustomfields.com/resources/wp-rest-api-integration/) in the plugin settings to show them in Wordpress API output.
 
