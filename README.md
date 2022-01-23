@@ -14,6 +14,12 @@ Then you should rename config-sample.php to config.php:
 mv config-sample.php config.php
 ```
 
+# GraphCMS Setup
+Before building this app, I started a new GraphCMS with their Blog standard schema.
+Note that I've changed the "content" from RichText field to Multi-line text, since I like to edit posts as plain html.
+If you want to keep the RichText field, a small changes to the code are needed.
+See the FAQ in this document for futher details.
+
 # How is the app structured
 Opening the app in the browser, you will notice a home screen with a list of available Models.
 The app is built to manage all Wordpress contents as a "Model".
@@ -75,10 +81,10 @@ You should investigate the sample Posts Runner and make sure that field names, d
 # FAQ
 ## I'm getting a GraphCMS error about the format of the "content" field
 If you started a new GraphCMS project with the Blog schema, by default it is a RichText field.
-This import tool works correctly with the "content" field as a "Multi-line Text".
+This import tool works correctly with the "content" field set as a "Multi-line Text".
 You can change the field content type from your GraphCMS Schema section.
 If you want to keep "content" as a RichText field, you have to change the graphQL mutation in the runner code.
-See [https://graphcms.com/docs/api-reference/schema/field-types#rich-text](here) for details.
+See [here](https://graphcms.com/docs/api-reference/schema/field-types#rich-text) for details.
 
 ## Why do I get an API error when putting per_page > 100?
 For security and performance reasons, the Wordpress REST API response is limited to 100 records.
