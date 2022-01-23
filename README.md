@@ -7,7 +7,7 @@ A local PHP stack, like MAMP, is required; you can also put this package on your
 
 Run Composer and install required dependencies:
 ```
-php composer.phar install
+composer install
 ```
 Then you should rename config-sample.php to config.php:
 ```
