@@ -16,9 +16,9 @@ mv config-sample.php config.php
 
 # GraphCMS Setup
 Before building this app, I started a new GraphCMS with their Blog standard schema.
-Note that I've changed the "content" from RichText field to Multi-line text, since I like to edit posts as plain html.
+Note that I've changed the "content" field from RichText to Multi-line text, since I like to edit posts as plain html.
 If you want to keep the RichText field, a small changes to the code are needed.
-See the FAQ in this document for futher details.
+See the FAQ in this document for further details.
 
 # How is the app structured
 Opening the app in the browser, you will notice a home screen with a list of available Models.
