@@ -1,7 +1,0 @@
-#migrationLogWrapper::-webkit-scrollbar-track { background-color: #374151; z-index: 999; }
-#migrationLogWrapper::-webkit-scrollbar { width: 0px; background-color: #374151; }
-#migrationLogWrapper::-webkit-scrollbar-thumb { background-color: #1F2937; border-radius: 10px; }
-
-#migrationProgress span { display: none; }
-#migrationProgress.running span.running { display: block; }
-#migrationProgress.done span.done { display: block; }

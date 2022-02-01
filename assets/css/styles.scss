@@ -1,0 +1,13 @@
+@import './variables';
+
+#migrationLogWrapper {
+	&::-webkit-scrollbar-track { background-color: $primary-bg-color; z-index: 999; }
+	&::-webkit-scrollbar { width: 0px; background-color: $primary-bg-color; }
+	&::-webkit-scrollbar-thumb { background-color: $secondary-bg-color; border-radius: 10px; }
+}
+
+#migrationProgress {
+	span { display: none; }
+	&.running span.running { display: block; }
+	&.done span.done { display: block; }
+}
